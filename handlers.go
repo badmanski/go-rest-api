@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -23,6 +24,13 @@ func TodoIndex(w http.ResponseWriter, r *http.Request) {
 
 func TodoShow(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	todoId := vars["id"]
-	fmt.Fprintf(w, "Todo: %q", todoId)
+	id, _ := strconv.Atoi(vars["id"])
+	todo := RepoFindTodo(id)
+
+	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	w.WriteHeader(http.StatusOK)
+
+	if err := json.NewEncoder(w).Encode(todo); err != nil {
+		panic(err)
+	}
 }
